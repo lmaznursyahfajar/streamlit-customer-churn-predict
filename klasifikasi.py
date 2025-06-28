@@ -71,8 +71,15 @@ if menu == "Dashboard":
             fig4 = px.histogram(df, x='Churn', color='Churn', title='Distribusi Status Churn')
             st.plotly_chart(fig4, use_container_width=True)
 
-    st.markdown("### Rata-rata Tenure dan TotalCharges per Payment Method")
-    fig5 = px.bar(df.groupby("PaymentMethod")[["tenure", "TotalCharges"]].mean().reset_index(),
+       # Bersihkan dan konversi kolom numerik
+    df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
+    df["tenure"] = pd.to_numeric(df["tenure"], errors="coerce")
+    
+    # Drop baris yang memiliki NaN setelah konversi
+    df_clean = df.dropna(subset=["tenure", "TotalCharges", "PaymentMethod"])
+    
+    # Visualisasi bar setelah pembersihan
+    fig5 = px.bar(df_clean.groupby("PaymentMethod")[["tenure", "TotalCharges"]].mean().reset_index(),
                   x="PaymentMethod", y=["tenure", "TotalCharges"],
                   barmode='group', title="Rata-rata Tenure & Total Charges per Payment Method")
     st.plotly_chart(fig5, use_container_width=True)
